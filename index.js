@@ -1,19 +1,8 @@
-const Parser = require('tree-sitter');
-const C = require('tree-sitter-c');
+const { getArgs, processArgs } = require('./src/getArgs.js');
+const { processCode } = require('./src/getGraph.js');
+const { processCallGraph } = require('./src/processCallGraph.js');
 
-const parser = new Parser();
-parser.setLanguage(C);
-const sourceCode = `
-void function_renan()
-{
-    printf("\noieeee);
-}
-
-int main() {
-    printf("Hello, Tree-sitter!");
-    return 0;
-}
-`;
-
-// 2. Parse the code into a syntax tree
-const tree = parser.parse(sourceCode);
+const { filePath, flags } = getArgs();
+const sourceCode = processArgs(flags, filePath);
+const graph = processCode(sourceCode);
+processCallGraph(graph);
