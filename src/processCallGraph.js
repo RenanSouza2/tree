@@ -1,39 +1,72 @@
 const { getPrompt } = require('./getPrompt.js');
 
-function isFree(funcDetails, evaluation) {
-    for(const call of funcDetails.calls) {
-        if(evaluation[call.target] == null) {
-            return false;
+function getGroup(graph, funcName, evaluation, groupSize) {
+    const group = new Set();
+    const toAdd = new Set([funcName]);
+    while(toAdd.size > 0) {
+        if(group.size >= groupSize) {
+            return new Set();
+        }
+
+        const funcToAdd = toAdd.values().next().value;
+        toAdd.delete(funcToAdd);
+        group.add(funcToAdd);
+
+        const calls = graph[funcToAdd].calls.map((x) => x.target);
+        for(const call of calls) {
+            if(evaluation[call]) {
+                continue;
+            }
+
+            if(group.has(call)) {
+                continue;
+            }
+
+            toAdd.add(call);
         }
     }
-    return true;
+    return group;
 }
 
-function evaluateFn(funcName, funcDetails, evaluation) {
+function evaluateGroup(group, evaluation) {
     // const prompt = getPrompt(funcDetails);
-    console.log(`Evaluating ${funcName}...`);
+    console.log('--------------');
+    for(const element of group) {
+        console.log(`Evaluating ${element}`);
+    }
     // TODO: CALL LLM
     return {};
 }
 
 function processCallGraph(graph) {
-    const evaluation = {}
+    const evaluation = {};
 
-    let stateChanged = true
-    while(stateChanged)
+    let groupSize = 1;
+    while(Object.keys(evaluation).length < Object.keys(graph).length)
     {
-        stateChanged = false;
+        let stateChanged = false;
         for (const [funcName, funcDetails] of Object.entries(graph)) {
             if(evaluation[funcName]) {
                 continue;
             }
 
-            if(!isFree(funcDetails, evaluation)) {
+            const group = getGroup(graph, funcName, evaluation, groupSize);
+            if(group.size == 0){
                 continue;
             }
 
             stateChanged = true;
-            evaluation[funcName] = evaluateFn(funcName, funcDetails, evaluation);
+            const _evaluation = evaluateGroup(group, evaluation);
+            for(const element of group) {
+                evaluation[element] = _evaluation;
+            }
+            break;
+        }
+
+        if(stateChanged) {
+            groupSize = 1;
+        } else {   
+            groupSize++;
         }
     }
 
@@ -44,6 +77,8 @@ function processCallGraph(graph) {
             console.log(funcName);
         }
     }
+
+    return evaluation;
 }
 
 module.exports = { processCallGraph };
