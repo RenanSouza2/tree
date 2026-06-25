@@ -5,9 +5,9 @@ const { setTimeout } = require('node:timers/promises');
 const ai = new GoogleGenAI({});
 
 async function tryCallGemini(promptPayload) {
-    console.log(`[~] Throttling engine (sleeping 4s)...`);
+    console.warn(`[~] Throttling engine (sleeping 4s)...`);
     await setTimeout(4000);
-    console.log(`[~] Dialing Gemini API...`);
+    console.warn(`[~] Dialing Gemini API...`);
 
     const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
@@ -27,10 +27,13 @@ async function tryCallGemini(promptPayload) {
 }
 
 async function callGemini(promptPayload) {
+    console.warn(`-------------------`);
+    console.warn(`New request`);
     const baseWaitTime = 2000;
-    const maxRetries = 5;
+    const maxRetries = 10;
     for(let attempt=0; attempt<maxRetries; attempt++) {
         try {
+            console.warn(`attempt: ${attempt}`);
             return await tryCallGemini(promptPayload);
         } catch (error) {
             const errorMessage = error.message || "";
