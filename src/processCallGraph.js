@@ -36,9 +36,7 @@ function evaluateSet(graph, set, evaluation) {
     }
 
     const prompt = getPrompt(graph, set, evaluation);
-    console.log(`promptPayload: ${prompt}}`);
-    // TODO: CALL LLM
-    return {};
+    return callGemini(prompt);
 }
 
 function getNextSet(graph, evaluation, setSize) {
@@ -52,34 +50,28 @@ function getNextSet(graph, evaluation, setSize) {
             continue;
         }
 
-        return [1, set];
+        return {nextSetSize: 1, set: set};
     }
-    return [setSize + 1, new Set()];
+    return {nextSetSize: setSize + 1, set: new Set()};
 }
 
-function processCallGraph(graph) {
+async function processCallGraph(graph) {
     const evaluation = {};
 
     let setSize = 1;
     while(Object.keys(evaluation).length < Object.keys(graph).length)
     {
         let set;
-        [setSize, set] = getNextSet(graph, evaluation, setSize);
+        ({nextSetSize: setSize, set} = getNextSet(graph, evaluation, setSize));
         if(set.size == 0) {
             continue;
         }
 
-        const _evaluation = evaluateSet(graph, set, evaluation);
+        const _evaluation = await evaluateSet(graph, set, evaluation);
+        console.log(`evaluation: ${JSON.stringify(_evaluation, null, 4)}`);
+
         for(const element of set) {
             evaluation[element] = _evaluation;
-        }
-    }
-
-    console.log()
-    console.log(`non evalauted functions`);
-    for(const [funcName, funcDetails] of Object.entries(graph)) {
-        if(!evaluation[funcName]) {
-            console.log(funcName);
         }
     }
 
