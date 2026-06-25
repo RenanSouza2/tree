@@ -65,6 +65,7 @@ function processCallGraph(graph) {
 
         if(stateChanged) {
             groupSize = 1;
+            break;
         } else {   
             groupSize++;
         }
