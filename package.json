@@ -4,6 +4,7 @@
     "tree-sitter@0.21.1": true
   },
   "dependencies": {
+    "@google/genai": "^2.10.0",
     "tree-sitter": "^0.21.1",
     "tree-sitter-c": "^0.21.4"
   }
