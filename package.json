@@ -1,10 +1,13 @@
 {
   "allowScripts": {
-    "tree-sitter-c@0.24.1": true,
-    "tree-sitter@0.21.1": true
+    "tree-sitter@0.21.1": true,
+    "@google/genai@2.10.0": true,
+    "protobufjs@7.6.4": true,
+    "tree-sitter-c@0.21.4": true
   },
   "dependencies": {
     "@google/genai": "^2.10.0",
+    "openai": "^6.45.0",
     "tree-sitter": "^0.21.1",
     "tree-sitter-c": "^0.21.4"
   }

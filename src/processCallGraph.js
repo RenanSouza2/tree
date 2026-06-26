@@ -1,5 +1,5 @@
-const { getPrompt } = require('./getPrompt.js');
-const { callGemini } = require('./llm.js');
+// const { callGemini } = require('./llm/gemini.js');
+const { callLocalLLM } = require('./llm/local.js');
 
 function getSet(graph, funcName, evaluation, setSize) {
     const set = new Set();
@@ -35,8 +35,7 @@ function evaluateSet(graph, set, evaluation) {
         console.log(`Evaluating ${element}`);
     }
 
-    const prompt = getPrompt(graph, set, evaluation);
-    return callGemini(prompt);
+    return callLocalLLM(graph, set, evaluation);
 }
 
 function getNextSet(graph, evaluation, setSize) {
